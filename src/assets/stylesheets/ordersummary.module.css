@@ -1,0 +1,56 @@
+.OrderSummary {
+    padding: 0.7rem 2.2rem;
+    font-size: 1.4rem;
+}
+
+.OrderSummary h3 {
+    margin: 2rem 0;
+}
+
+.OrderSummary ul {
+    list-style: none;
+    margin: 0.7rem 0;
+    margin-left: 1.2rem;
+}
+
+.OrderSummary ul li::before {
+    display: inline-block;
+    content: '\2014';
+    font-size: inherit;
+}
+
+.OrderSummary ul li span {
+    text-transform: capitalize;
+    font-style: italic;
+}
+
+.OrderSummary ul li span:nth-child(2) {
+    font-weight: 600;
+}
+/* 
+.OrderSummary p:nth-child(4) {
+    text-align: center;
+} */
+
+/* .CTA {
+    margin-top: 2.5rem;
+    display: flex;
+    justify-content: space-between;
+}
+
+.CTA button {
+    border: none;
+    font-family: inherit;
+    font-size: 2rem;
+    padding: 0.7rem 1.6rem;
+    border-radius: 5rem;
+    background: linear-gradient(to bottom right, #333, #aa3eff);
+    color: white;
+    cursor: pointer;
+    box-shadow: 3px 5px 7px rgba(0, 0, 0, 0.2);
+    transition: background 0.3s ease-in;
+}
+
+.CTA button:hover {
+    background: linear-gradient(to top right, #333, #aa3eff);
+} */
