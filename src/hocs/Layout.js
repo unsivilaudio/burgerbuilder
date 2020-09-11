@@ -1,6 +1,6 @@
 import React from 'react';
 
-import Aux from './Aux';
+import Aux from './Wrap';
 import ToolBar from '../components/navigation/Toolbar';
 import SideDrawer from '../components/navigation/SideDrawer';
 import classes from '../assets/stylesheets/layout.module.css';
