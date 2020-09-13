@@ -33,6 +33,7 @@
         height: 100%;
         padding: 1.6rem 1rem;
         border-bottom: 4px solid transparent;
+        transition: all 0.3s ease-in;
     }
 
     .NavItem a:hover,
