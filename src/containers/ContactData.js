@@ -16,6 +16,11 @@ class ContactData extends React.Component {
                     placeholder: 'Your Name',
                 },
                 value: '',
+                validation: {
+                    required: true,
+                },
+                valid: false,
+                touched: false,
             },
             street: {
                 elementType: 'input',
@@ -24,6 +29,11 @@ class ContactData extends React.Component {
                     placeholder: 'Your Street',
                 },
                 value: '',
+                validation: {
+                    required: true,
+                },
+                valid: false,
+                touched: false,
             },
             postCode: {
                 elementType: 'input',
@@ -32,6 +42,13 @@ class ContactData extends React.Component {
                     placeholder: 'Your Zipcode',
                 },
                 value: '',
+                validation: {
+                    required: true,
+                    minLength: 5,
+                    maxLength: 5,
+                },
+                valid: false,
+                touched: false,
             },
             country: {
                 elementType: 'input',
@@ -39,7 +56,12 @@ class ContactData extends React.Component {
                     type: 'text',
                     placeholder: 'Your Country',
                 },
-                value: 'USA',
+                value: '',
+                validation: {
+                    required: true,
+                },
+                valid: false,
+                touched: false,
             },
             email: {
                 elementType: 'input',
@@ -48,6 +70,11 @@ class ContactData extends React.Component {
                     placeholder: 'Your E-Mail',
                 },
                 value: '',
+                validation: {
+                    required: true,
+                },
+                valid: false,
+                touched: false,
             },
             deliveryMethod: {
                 elementType: 'select',
@@ -60,12 +87,50 @@ class ContactData extends React.Component {
                 value: 'fastest',
             },
         },
+        formIsValid: false,
         loading: false,
     };
+
+    checkValidity(value, rules) {
+        if (!rules) return true;
+        let isValid = true;
+
+        if (rules.required) {
+            isValid = value.trim() !== '' && isValid;
+        }
+
+        if (rules.minLength) {
+            isValid = value.length >= rules.minLength && isValid;
+        }
+
+        if (rules.maxLength) {
+            isValid = value.length <= rules.maxLength && isValid;
+        }
+
+        return isValid;
+    }
 
     handleChange = (e, id) => {
         let orderForm = { ...this.state.orderForm };
         orderForm[id].value = e.target.value;
+        orderForm[id].valid = this.checkValidity(
+            orderForm[id].value,
+            orderForm[id].validation
+        );
+        orderForm[id].touched = true;
+
+        let formIsValid = false;
+        const inputsAreValid = Object.keys(this.state.orderForm)
+            .map(key => {
+                if (!this.state.orderForm[key].validation) return true;
+                return this.state.orderForm[key].valid;
+            })
+            .every(el => el);
+        if (inputsAreValid) {
+            formIsValid = true;
+            this.setState({ formIsValid });
+        }
+
         this.setState({ orderForm });
     };
 
@@ -105,6 +170,9 @@ class ContactData extends React.Component {
                     elementType={newInput.elementType}
                     elementConfig={newInput.elementConfig}
                     value={newInput.value}
+                    invalid={!newInput.valid}
+                    shouldValidate={newInput.validation}
+                    touched={newInput.touched}
                     handleChange={e => this.handleChange(e, key)}
                 />
             );
@@ -116,7 +184,10 @@ class ContactData extends React.Component {
             <form onSubmit={this.handleSubmit}>
                 {this.renderInputs()}
                 <div className={classes.CTA}>
-                    <Button btnType='Success' clicked={this.handleSubmit}>
+                    <Button
+                        btnType='Success'
+                        clicked={this.handleSubmit}
+                        disabled={!this.state.formIsValid}>
                         Order Now
                     </Button>
                 </div>
