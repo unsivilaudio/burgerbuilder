@@ -4,44 +4,85 @@ import axios from '../api/axios-orders';
 import Button from '../components/ui/Button';
 import classes from '../assets/stylesheets/contactdata.module.css';
 import Spinner from '../components/ui/Spinner';
+import Input from '../components/ui/Input';
 
 class ContactData extends React.Component {
     state = {
-        name: '',
-        email: '',
-        address: {
-            street: '',
-            postCode: '',
+        orderForm: {
+            name: {
+                elementType: 'input',
+                elementConfig: {
+                    type: 'text',
+                    placeholder: 'Your Name',
+                },
+                value: '',
+            },
+            street: {
+                elementType: 'input',
+                elementConfig: {
+                    type: 'text',
+                    placeholder: 'Your Street',
+                },
+                value: '',
+            },
+            postCode: {
+                elementType: 'input',
+                elementConfig: {
+                    type: 'text',
+                    placeholder: 'Your Zipcode',
+                },
+                value: '',
+            },
+            country: {
+                elementType: 'input',
+                elementConfig: {
+                    type: 'text',
+                    placeholder: 'Your Country',
+                },
+                value: 'USA',
+            },
+            email: {
+                elementType: 'input',
+                elementConfig: {
+                    type: 'text',
+                    placeholder: 'Your E-Mail',
+                },
+                value: '',
+            },
+            deliveryMethod: {
+                elementType: 'select',
+                elementConfig: {
+                    options: [
+                        { value: 'fastest', displayValue: 'Fastest' },
+                        { value: 'cheapest', displayValue: 'Cheapest' },
+                    ],
+                },
+                value: 'fastest',
+            },
         },
         loading: false,
     };
 
-    handleChange = e => {
-        if (e.target.name.split('.').length > 1) {
-            const [parentEl, childEl] = e.target.name.split('.');
-            return this.setState({
-                [parentEl]: {
-                    ...this.state.address,
-                    [childEl]: e.target.value,
-                },
-            });
-        }
-        this.setState({ [e.target.name]: e.target.value });
+    handleChange = (e, id) => {
+        let orderForm = { ...this.state.orderForm };
+        orderForm[id].value = e.target.value;
+        this.setState({ orderForm });
     };
 
     handleSubmit = e => {
         e.preventDefault();
         this.setState({ loading: true });
-        const { name, address, email } = this.state;
+        const submittedOrder = Object.keys(this.state.orderForm).reduce(
+            (acc, key) => {
+                acc[key] = this.state.orderForm[key].value;
+                return acc;
+            },
+            {}
+        );
         const order = {
             ingredients: this.props.ingredients,
             price: this.props.price,
-            customer: {
-                name,
-                address,
-                email,
-            },
-            deliveryMethod: 'fastest',
+            ...submittedOrder,
         };
         axios
             .post('/orders.json', order)
@@ -54,37 +95,26 @@ class ContactData extends React.Component {
             });
     };
 
+    renderInputs = () => {
+        return Object.keys(this.state.orderForm).map(key => {
+            let newInput = this.state.orderForm[key];
+            return (
+                <Input
+                    key={key}
+                    label={key}
+                    elementType={newInput.elementType}
+                    elementConfig={newInput.elementConfig}
+                    value={newInput.value}
+                    handleChange={e => this.handleChange(e, key)}
+                />
+            );
+        });
+    };
+
     render() {
         let form = (
             <form onSubmit={this.handleSubmit}>
-                <input
-                    type='text'
-                    name='name'
-                    value={this.state.name}
-                    onChange={this.handleChange}
-                    placeholder='Your name'
-                />
-                <input
-                    type='email'
-                    name='email'
-                    value={this.state.email}
-                    onChange={this.handleChange}
-                    placeholder='Your email'
-                />
-                <input
-                    type='text'
-                    name='address.street'
-                    value={this.state.address.street}
-                    onChange={this.handleChange}
-                    placeholder='Your street'
-                />
-                <input
-                    type='text'
-                    name='address.postCode'
-                    value={this.state.address.postCode}
-                    onChange={this.handleChange}
-                    placeholder='Your postcode'
-                />
+                {this.renderInputs()}
                 <div className={classes.CTA}>
                     <Button btnType='Success' clicked={this.handleSubmit}>
                         Order Now
