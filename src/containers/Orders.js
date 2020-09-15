@@ -5,23 +5,12 @@ import Order from '../components/order/Order';
 import axios from '../api/axios-orders';
 import Spinner from '../components/ui/Spinner';
 import withErrorHandler from '../hocs/withErrorHandler';
-import { fetchOrders } from '../actions';
+import { fetchOrders } from '../actions/order';
 
 class Orders extends Component {
-    state = { loading: true };
-
     componentDidMount() {
-        this.getOrders();
+        this.props.fetchOrders();
     }
-
-    getOrders = async () => {
-        try {
-            await this.props.fetchOrders();
-        } catch (err) {
-            console.log(err);
-        }
-        this.setState({ loading: false });
-    };
 
     renderOrderList = () => {
         return this.props.orders.map(order => {
@@ -38,14 +27,14 @@ class Orders extends Component {
     render() {
         return (
             <div>
-                {this.state.loading ? <Spinner /> : this.renderOrderList()}
+                {this.props.loading ? <Spinner /> : this.renderOrderList()}
             </div>
         );
     }
 }
 
-const mapStateToProps = ({ orders }) => {
-    return { orders };
+const mapStateToProps = ({ orders: { orders, loading } }) => {
+    return { orders, loading };
 };
 
 const app = withErrorHandler(Orders, axios);

@@ -9,13 +9,16 @@ import Modal from '../components/ui/Modal';
 import OrderSummary from '../components/burger/OrderSummary';
 import Spinner from '../components/ui/Spinner';
 import withErrorHandler from '../hocs/withErrorHandler';
-import { addIngredient, removeIngredient, getIngredients } from '../actions';
+import {
+    addIngredient,
+    removeIngredient,
+    getIngredients,
+} from '../actions/burgerBuilder';
+import { purchaseInit } from '../actions/order';
 
 class BurgerBuilder extends React.Component {
     state = {
         purchasing: false,
-        loading: false,
-        error: false,
     };
 
     componentDidMount() {
@@ -41,6 +44,7 @@ class BurgerBuilder extends React.Component {
     };
 
     purchaseContinued = () => {
+        this.props.purchaseInit();
         this.props.history.push('/checkout');
     };
 
@@ -61,11 +65,7 @@ class BurgerBuilder extends React.Component {
             />
         );
 
-        if (this.state.loading) {
-            orderSummary = <Spinner />;
-        }
-
-        let burger = this.state.error ? (
+        let burger = this.props.error ? (
             <p>Ingredients can't be loaded</p>
         ) : (
             <Spinner />
@@ -102,8 +102,10 @@ class BurgerBuilder extends React.Component {
     }
 }
 
-const mapStateToProps = ({ ingredients: { ingredients, totalPrice } }) => {
-    return { ingredients, totalPrice };
+const mapStateToProps = ({
+    ingredients: { ingredients, totalPrice, error },
+}) => {
+    return { ingredients, totalPrice, error };
 };
 
 const app = withErrorHandler(BurgerBuilder, axios);
@@ -112,4 +114,5 @@ export default connect(mapStateToProps, {
     addIngredient,
     removeIngredient,
     getIngredients,
+    purchaseInit,
 })(app);
