@@ -1,12 +1,11 @@
-import { ADD_INGREDIENT, REMOVE_INGREDIENT } from '../actions/types';
+import {
+    ADD_INGREDIENT,
+    REMOVE_INGREDIENT,
+    SET_INGREDIENTS,
+} from '../actions/types';
 
 const _INITIAL_STATE = {
-    ingredients: {
-        salad: 0,
-        bacon: 0,
-        cheese: 0,
-        meat: 0,
-    },
+    ingredients: {},
     totalPrice: 4,
 };
 
@@ -42,6 +41,11 @@ export default (state = _INITIAL_STATE, action) => {
                 totalPrice:
                     state.totalPrice -
                     _INGREDIENT_PRICES[action.ingredientName],
+            };
+        case SET_INGREDIENTS:
+            return {
+                ...state,
+                ingredients: action.payload,
             };
         default:
             return state;

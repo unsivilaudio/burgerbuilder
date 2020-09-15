@@ -6,6 +6,7 @@ import Button from '../components/ui/Button';
 import classes from '../assets/stylesheets/contactdata.module.css';
 import Spinner from '../components/ui/Spinner';
 import Input from '../components/ui/Input';
+import { submitOrder } from '../actions';
 
 class ContactData extends React.Component {
     state = {
@@ -135,7 +136,7 @@ class ContactData extends React.Component {
         this.setState({ orderForm });
     };
 
-    handleSubmit = e => {
+    handleSubmit = async e => {
         e.preventDefault();
         this.setState({ loading: true });
         const submittedOrder = Object.keys(this.state.orderForm).reduce(
@@ -150,15 +151,13 @@ class ContactData extends React.Component {
             price: this.props.totalPrice,
             ...submittedOrder,
         };
-        axios
-            .post('/orders.json', order)
-            .then(res => {
-                this.setState({ loading: false });
-                this.props.history.push('/');
-            })
-            .catch(err => {
-                this.setState({ loading: false });
-            });
+        try {
+            await this.props.submitOrder(order);
+            this.setState({ loading: false });
+            this.props.history.push('/');
+        } catch (err) {
+            console.log(err);
+        }
     };
 
     renderInputs = () => {
@@ -212,4 +211,4 @@ const mapStateToProps = ({ ingredients: { ingredients, totalPrice } }) => {
     return { ingredients, totalPrice };
 };
 
-export default connect(mapStateToProps)(ContactData);
+export default connect(mapStateToProps, { submitOrder })(ContactData);

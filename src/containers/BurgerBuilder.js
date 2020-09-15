@@ -9,7 +9,7 @@ import Modal from '../components/ui/Modal';
 import OrderSummary from '../components/burger/OrderSummary';
 import Spinner from '../components/ui/Spinner';
 import withErrorHandler from '../hocs/withErrorHandler';
-import { addIngredient, removeIngredient } from '../actions';
+import { addIngredient, removeIngredient, getIngredients } from '../actions';
 
 class BurgerBuilder extends React.Component {
     state = {
@@ -19,14 +19,7 @@ class BurgerBuilder extends React.Component {
     };
 
     componentDidMount() {
-        // axios
-        //     .get('/ingredients.json')
-        //     .then(res => {
-        //         this.setState({ ingredients: res.data });
-        //     })
-        //     .catch(err => {
-        //         this.setState({ error: true });
-        //     });
+        this.props.getIngredients();
     }
 
     updatePurchaseState(ingredients) {
@@ -115,6 +108,8 @@ const mapStateToProps = ({ ingredients: { ingredients, totalPrice } }) => {
 
 const app = withErrorHandler(BurgerBuilder, axios);
 
-export default connect(mapStateToProps, { addIngredient, removeIngredient })(
-    app
-);
+export default connect(mapStateToProps, {
+    addIngredient,
+    removeIngredient,
+    getIngredients,
+})(app);
