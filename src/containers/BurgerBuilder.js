@@ -14,6 +14,7 @@ import {
     removeIngredient,
     getIngredients,
 } from '../actions/burgerBuilder';
+import { setAuthRedirectPath } from '../actions/auth';
 import { purchaseInit } from '../actions/order';
 
 class BurgerBuilder extends React.Component {
@@ -36,7 +37,12 @@ class BurgerBuilder extends React.Component {
     }
 
     purchaseHandler = () => {
-        this.setState({ purchasing: true });
+        if (this.props.isAuthenticated) {
+            this.setState({ purchasing: true });
+        } else {
+            this.props.setAuthRedirectPath('/checkout');
+            this.props.history.push('/auth');
+        }
     };
 
     purchaseCancelHandler = () => {
@@ -79,11 +85,12 @@ class BurgerBuilder extends React.Component {
                         ingredientAdded={this.props.addIngredient}
                         ingredientRemoved={this.props.removeIngredient}
                         disabled={disabledInfo}
-                        price={this.props.totalPrice}
                         purchasable={this.updatePurchaseState(
                             this.props.ingredients
                         )}
                         ordered={this.purchaseHandler}
+                        isAuth={this.props.isAuthenticated}
+                        price={this.props.totalPrice}
                     />
                 </Aux>
             );
@@ -104,8 +111,9 @@ class BurgerBuilder extends React.Component {
 
 const mapStateToProps = ({
     ingredients: { ingredients, totalPrice, error },
+    auth: { token },
 }) => {
-    return { ingredients, totalPrice, error };
+    return { ingredients, totalPrice, error, isAuthenticated: token !== null };
 };
 
 const app = withErrorHandler(BurgerBuilder, axios);
@@ -115,4 +123,5 @@ export default connect(mapStateToProps, {
     removeIngredient,
     getIngredients,
     purchaseInit,
+    setAuthRedirectPath,
 })(app);

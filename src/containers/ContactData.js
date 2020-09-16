@@ -113,27 +113,35 @@ class ContactData extends React.Component {
         return isValid;
     }
 
-    handleChange = (e, id) => {
-        let orderForm = { ...this.state.orderForm };
-        orderForm[id].value = e.target.value;
-        orderForm[id].valid = this.checkValidity(
-            orderForm[id].value,
-            orderForm[id].validation
-        );
-        orderForm[id].touched = true;
-
+    validateForm() {
         let formIsValid = false;
-        const inputsAreValid = Object.keys(this.state.orderForm)
+        const validInputs = Object.keys(this.state.orderForm)
             .map(key => {
                 if (!this.state.orderForm[key].validation) return true;
                 return this.state.orderForm[key].valid;
             })
             .every(el => el);
-        if (inputsAreValid) {
+        if (validInputs) {
             formIsValid = true;
             this.setState({ formIsValid });
         }
+    }
 
+    handleChange = (e, id) => {
+        const { value } = e.target;
+        let orderForm = {
+            ...this.state.orderForm,
+            [id]: {
+                ...this.state.orderForm[id],
+                value,
+                valid: this.checkValidity(
+                    value,
+                    this.state.orderForm[id].validation
+                ),
+                touched: true,
+            },
+        };
+        this.validateForm();
         this.setState({ orderForm });
     };
 
@@ -151,9 +159,10 @@ class ContactData extends React.Component {
             ingredients: this.props.ingredients,
             price: this.props.totalPrice,
             orderData: { ...formData },
+            userId: this.props.userId,
         };
 
-        this.props.purchaseBurger(order);
+        this.props.purchaseBurger(order, this.props.token);
     };
 
     renderInputs = () => {
@@ -205,9 +214,10 @@ class ContactData extends React.Component {
 
 const mapStateToProps = ({
     ingredients: { ingredients, totalPrice },
-    orders,
+    orders: { loading },
+    auth: { token, userId },
 }) => {
-    return { ingredients, totalPrice, loading: orders.loading };
+    return { ingredients, totalPrice, loading, token, userId };
 };
 
 const app = withErrorHandler(ContactData, axios);

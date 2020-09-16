@@ -9,7 +9,7 @@ import { fetchOrders } from '../actions/order';
 
 class Orders extends Component {
     componentDidMount() {
-        this.props.fetchOrders();
+        this.props.fetchOrders(this.props.token, this.props.userId);
     }
 
     renderOrderList = () => {
@@ -33,8 +33,11 @@ class Orders extends Component {
     }
 }
 
-const mapStateToProps = ({ orders: { orders, loading } }) => {
-    return { orders, loading };
+const mapStateToProps = ({
+    orders: { orders, loading },
+    auth: { token, userId },
+}) => {
+    return { orders, loading, token, userId };
 };
 
 const app = withErrorHandler(Orders, axios);
