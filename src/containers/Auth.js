@@ -1,13 +1,14 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { Redirect } from 'react-router-dom';
 
 import Spinner from '../components/ui/Spinner';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 import { auth, setAuthRedirectPath } from '../actions/auth';
+import { updateObject, checkValidity } from '../shared/utility';
 
 import classes from '../assets/stylesheets/auth.module.css';
-import { Redirect } from 'react-router-dom';
 
 class Auth extends React.Component {
     state = {
@@ -51,26 +52,6 @@ class Auth extends React.Component {
         }
     }
 
-    checkValidity(value, rules) {
-        if (!rules) return true;
-        let isValid = true;
-
-        if (rules.required) {
-            isValid = value.trim() !== '' && isValid;
-        }
-
-        if (rules.isEmail) {
-            const rgxEmail = /\S+@\S+\.\S+/;
-            isValid = rgxEmail.test(value) && isValid;
-        }
-
-        if (rules.minLength) {
-            isValid = value.length >= rules.minLength && isValid;
-        }
-
-        return isValid;
-    }
-
     validateForm() {
         let formIsValid = false;
         const validInputs = Object.keys(this.state.controls)
@@ -81,24 +62,21 @@ class Auth extends React.Component {
             .every(el => el);
         if (validInputs) {
             formIsValid = true;
-            this.setState({ formIsValid });
         }
+        this.setState({ formIsValid });
     }
 
     handleChange = (e, id) => {
         const { value } = e.target;
-        let controls = {
-            ...this.state.controls,
+        const controls = updateObject(this.state.controls, {
             [id]: {
                 ...this.state.controls[id],
                 value,
-                valid: this.checkValidity(
-                    value,
-                    this.state.controls[id].validation
-                ),
+                valid: checkValidity(value, this.state.controls[id].validation),
                 touched: true,
             },
-        };
+        });
+
         this.validateForm();
         this.setState({ controls });
     };
@@ -139,7 +117,8 @@ class Auth extends React.Component {
 
     render() {
         let form = (
-            <>
+            <div className={classes.Form}>
+                <h2>{this.state.isSignup ? 'Sign Up' : 'Sign In'}</h2>
                 <form onSubmit={this.handleSubmit}>
                     {this.renderInputs()}
                     <Button
@@ -149,9 +128,11 @@ class Auth extends React.Component {
                     </Button>
                 </form>
                 <Button btnType='Danger' clicked={this.switchAuthModeHandler}>
-                    Switch to {this.state.isSignup ? 'Sign In' : 'Sign Up'}
+                    <i>
+                        Switch to {this.state.isSignup ? 'Sign In' : 'Sign Up'}?
+                    </i>
                 </Button>
-            </>
+            </div>
         );
 
         if (this.props.loading) {

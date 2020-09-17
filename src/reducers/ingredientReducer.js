@@ -5,7 +5,7 @@ import {
     FETCH_INGREDIENTS_FAILED,
 } from '../actions/types';
 
-import { updateObject } from './utility';
+import { updateObject } from '../shared/utility';
 
 const _INITIAL_STATE = {
     ingredients: {},

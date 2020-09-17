@@ -8,6 +8,7 @@ import classes from '../assets/stylesheets/contactdata.module.css';
 import Spinner from '../components/ui/Spinner';
 import Input from '../components/ui/Input';
 import { purchaseBurger } from '../actions/order';
+import { updateObject, checkValidity } from '../shared/utility';
 
 class ContactData extends React.Component {
     state = {
@@ -75,6 +76,7 @@ class ContactData extends React.Component {
                 value: '',
                 validation: {
                     required: true,
+                    isEmail: true,
                 },
                 valid: false,
                 touched: false,
@@ -94,25 +96,6 @@ class ContactData extends React.Component {
         loading: false,
     };
 
-    checkValidity(value, rules) {
-        if (!rules) return true;
-        let isValid = true;
-
-        if (rules.required) {
-            isValid = value.trim() !== '' && isValid;
-        }
-
-        if (rules.minLength) {
-            isValid = value.length >= rules.minLength && isValid;
-        }
-
-        if (rules.maxLength) {
-            isValid = value.length <= rules.maxLength && isValid;
-        }
-
-        return isValid;
-    }
-
     validateForm() {
         let formIsValid = false;
         const validInputs = Object.keys(this.state.orderForm)
@@ -129,18 +112,15 @@ class ContactData extends React.Component {
 
     handleChange = (e, id) => {
         const { value } = e.target;
-        let orderForm = {
-            ...this.state.orderForm,
-            [id]: {
-                ...this.state.orderForm[id],
-                value,
-                valid: this.checkValidity(
-                    value,
-                    this.state.orderForm[id].validation
-                ),
-                touched: true,
-            },
-        };
+        const updateFormField = updateObject(this.state.orderForm[id], {
+            value,
+            touched: true,
+            valid: checkValidity(value, this.state.orderForm[id].validation),
+        });
+        const orderForm = updateObject(this.state.orderForm, {
+            [id]: updateFormField,
+        });
+
         this.validateForm();
         this.setState({ orderForm });
     };
