@@ -17,7 +17,7 @@ import {
 import { setAuthRedirectPath } from '../actions/auth';
 import { purchaseInit } from '../actions/order';
 
-class BurgerBuilder extends React.Component {
+export class BurgerBuilder extends React.Component {
     state = {
         purchasing: false,
     };
