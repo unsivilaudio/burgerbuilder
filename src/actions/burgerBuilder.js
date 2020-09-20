@@ -1,10 +1,8 @@
 import {
     ADD_INGREDIENT,
-    FETCH_INGREDIENTS_FAILED,
+    FETCH_INGREDIENTS_START,
     REMOVE_INGREDIENT,
-    SET_INGREDIENTS,
 } from './types';
-import axios from '../api/axios-orders';
 
 export const addIngredient = ingredientName => dispatch => {
     dispatch({
@@ -21,17 +19,7 @@ export const removeIngredient = ingredientName => dispatch => {
 };
 
 export const getIngredients = () => dispatch => {
-    axios
-        .get('/ingredients.json')
-        .then(res => {
-            dispatch({
-                type: SET_INGREDIENTS,
-                payload: res.data,
-            });
-        })
-        .catch(err => {
-            dispatch({
-                type: FETCH_INGREDIENTS_FAILED,
-            });
-        });
+    dispatch({
+        type: FETCH_INGREDIENTS_START,
+    });
 };
