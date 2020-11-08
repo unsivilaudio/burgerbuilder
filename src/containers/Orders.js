@@ -1,33 +1,24 @@
-import React, { Component } from 'react';
+import React, { useEffect } from 'react';
+import { connect } from 'react-redux';
 
 import Order from '../components/order/Order';
 import axios from '../api/axios-orders';
 import Spinner from '../components/ui/Spinner';
 import withErrorHandler from '../hocs/withErrorHandler';
+import { fetchOrders } from '../actions/order';
 
-class Orders extends Component {
-    state = { orders: [], loading: true };
+const Orders = props => {
+    const { fetchOrders, token, userId } = props;
 
-    componentDidMount() {
-        axios
-            .get('/orders.json')
-            .then(res => {
-                const orders = Object.keys(res.data).map(key => {
-                    const { ingredients, price } = res.data[key];
-                    return { key, ingredients, price };
-                });
-                this.setState({ loading: false, orders });
-            })
-            .catch(res => {
-                this.setState({ loading: false });
-            });
-    }
+    useEffect(() => {
+        fetchOrders(token, userId);
+    }, [fetchOrders, token, userId]);
 
-    renderOrderList = () => {
-        return this.state.orders.map(order => {
+    const renderOrderList = () => {
+        return props.orders.map(order => {
             return (
                 <Order
-                    key={order.key}
+                    key={order.id}
                     price={order.price.toFixed(2)}
                     ingredients={order.ingredients}
                 />
@@ -35,13 +26,16 @@ class Orders extends Component {
         });
     };
 
-    render() {
-        return (
-            <div>
-                {this.state.loading ? <Spinner /> : this.renderOrderList()}
-            </div>
-        );
-    }
-}
+    return <div>{props.loading ? <Spinner /> : renderOrderList()}</div>;
+};
 
-export default withErrorHandler(Orders, axios);
+const mapStateToProps = ({
+    orders: { orders, loading },
+    auth: { token, userId },
+}) => {
+    return { orders, loading, token, userId };
+};
+
+const app = withErrorHandler(Orders, axios);
+
+export default connect(mapStateToProps, { fetchOrders })(app);

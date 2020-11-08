@@ -1,23 +1,64 @@
-import React from 'react';
-import { Route } from 'react-router-dom';
+import React, { useEffect, Suspense } from 'react';
+import { Redirect, Route, Switch } from 'react-router-dom';
+import { connect } from 'react-redux';
 
 import Layout from '../hocs/Layout';
 import BurgerBuilder from '../containers/BurgerBuilder';
-import Checkout from '../containers/Checkout';
-import Orders from '../containers/Orders';
+import Logout from '../containers/Logout';
+import { authCheckState } from '../actions/auth';
 
-class App extends React.Component {
-    render() {
-        return (
-            <div>
-                <Layout>
-                    <Route exact path='/' component={BurgerBuilder} />
-                    <Route exact path='/orders' component={Orders} />
-                    <Route path='/checkout' component={Checkout} />
-                </Layout>
-            </div>
+const Checkout = React.lazy(() => {
+    return import('../containers/Checkout');
+});
+
+const Orders = React.lazy(() => {
+    return import('../containers/Orders');
+});
+const Auth = React.lazy(() => {
+    return import('../containers/Auth');
+});
+
+const App = props => {
+    const { authCheckState } = props;
+
+    useEffect(() => {
+        authCheckState();
+    }, [authCheckState]);
+
+    let routes = (
+        <Switch>
+            <Route path='/auth' render={props => <Auth {...props} />} />
+            <Route path='/' exact component={BurgerBuilder} />
+            <Redirect to='/' />
+        </Switch>
+    );
+
+    if (props.isAuthenticated) {
+        routes = (
+            <Switch>
+                <Route
+                    path='/checkout'
+                    render={props => <Checkout {...props} />}
+                />
+                <Route path='/orders' render={props => <Orders {...props} />} />
+                <Route path='/auth' render={props => <Auth {...props} />} />
+                <Route path='/logout' component={Logout} />
+                <Route path='/' exact component={BurgerBuilder} />
+            </Switch>
         );
     }
-}
 
-export default App;
+    return (
+        <div>
+            <Layout>
+                <Suspense fallback={<p>Loading...</p>}>{routes}</Suspense>
+            </Layout>
+        </div>
+    );
+};
+
+const mapStateToProps = ({ auth }) => {
+    return { isAuthenticated: auth.token !== null };
+};
+
+export default connect(mapStateToProps, { authCheckState })(App);

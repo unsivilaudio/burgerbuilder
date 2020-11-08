@@ -1,5 +1,6 @@
 .Order {
     width: 80%;
+    line-height: 1.7;
     border: 1px solid #eee;
     box-shadow: 0 2px 3px #ccc;
     padding: 10px;
@@ -7,10 +8,27 @@
     box-sizing: border-box;
 }
 
+.Order p {
+    font-style: italic;
+    /* margin-bottom: 5px; */
+    padding: 7px 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.Order p:nth-child(2) {
+    border-top: 1px solid #ccc;
+    justify-content: space-between;
+}
+
 .Order span {
+    background-color: #eee;
+    font-style: normal;
     text-transform: capitalize;
-    display: inline-block;
-    margin: 0 8px;
-    padding: 0 3px;
+    margin: 10px 0;
+    margin-left: 7px;
+    padding: 0 7px;
+    border-radius: 10px;
     border: 1px solid gray;
 }
